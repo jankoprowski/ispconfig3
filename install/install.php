@@ -140,7 +140,7 @@ if(!function_exists('mysql_connect')) _die('No PHP MySQL functions available. Pl
 //** Get MySQL root credentials
 $finished = false;
 do {
-	$tmp_mysql_server_host = $inst->free_query('mysql.host', 'MySQL server hostname', $conf['mysql']['host']);
+	$tmp_mysql_server_host = $inst->free_query('mysql.hostname', 'MySQL server hostname', $conf['mysql']['host']);
 	$tmp_mysql_server_admin_user = $inst->free_query('mysql.admin_user', 'MySQL root username', $conf['mysql']['admin_user']);
 	$tmp_mysql_server_admin_password = $inst->free_query('mysql.admin_password', 'MySQL root password', $conf['mysql']['admin_password']);
 	$tmp_mysql_server_database = $inst->free_query('mysql.database', 'MySQL database to create', $conf['mysql']['database']);
