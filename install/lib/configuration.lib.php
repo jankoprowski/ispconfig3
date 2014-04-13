@@ -19,7 +19,7 @@ class configuration implements arrayaccess {
            }
 
            $filename = $options['config'];
-           $values = parse_ini_file($options['config']);
+           $values = parse_ini_file($options['config'], TRUE);
 
            return new configuration($filename, $values);
 
@@ -36,16 +36,37 @@ class configuration implements arrayaccess {
         throw new BadMethodCallException("Configuration object is read only.");
     }
     public function offsetExists($index) {
+
+        if (strpos($index, '.') !== FALSE) {
+            
+            list($section, $property) = split('\.', $index);
+            return isset($this->values[$section][$property]);
+        }
+        
         return isset($this->values[$index]);
     }
+    
     public function offsetUnset($offset) {
         throw new BadMethodCallException("Configuration object is read only.");
     }
     
     public function offsetGet($index) {
+        
+        
+        
+        if (strpos($index, '.') !== FALSE) {
+            
+            list($section, $property) = split('\.', $index);
+            
+            if (isset($this->values[$section][$property])) {
+              return $this->values[$section][$property];
+            }
+        }
+        
         if (isset($this->values[$index])) {
            return $this->values[$index];
         }
+        
         throw new Exception("Property '".$index."' does not exist.");
     }
 }

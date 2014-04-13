@@ -70,4 +70,13 @@ class ConfigurationTest extends PHPUnit_Framework_TestCase {
         
         unset($config['key']);
     }
+    
+    public function testOffsetGet_tryToGetPropertyHostnameFromSectionMysql_separatingSectionNameFromPropertyNameByDotWorks() {
+        
+        $options = array();
+        $options['config'] = 'resources/mysql.ini';
+        $config = configuration::read($options);
+        
+        $this->assertEquals('localhost', $config['mysql.hostname']);
+    }
 }
