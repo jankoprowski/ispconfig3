@@ -39,7 +39,7 @@ class configuration implements arrayaccess {
 
         if (strpos($index, '.') !== FALSE) {
             
-            list($section, $property) = split('\.', $index);
+            list($section, $property) = explode('.', $index);
             return isset($this->values[$section][$property]);
         }
         
@@ -56,7 +56,7 @@ class configuration implements arrayaccess {
         
         if (strpos($index, '.') !== FALSE) {
             
-            list($section, $property) = split('\.', $index);
+            list($section, $property) = explode('.', $index);
             
             if (isset($this->values[$section][$property])) {
               return $this->values[$section][$property];
