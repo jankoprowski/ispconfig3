@@ -37,10 +37,12 @@ class installer_base {
 	public $install_ispconfig_interface = true;
 	public $is_update = false; // true if it is an update, falsi if it is a new install
 
+        private $default;
 
-	public function __construct() {
+	public function __construct($default) {
 		global $conf; //TODO: maybe $conf  should be passed to constructor
-		//$this->conf = $conf;
+                //$this->conf = $conf;
+                $this->default = $default;
 	}
 
 	//: TODO  Implement the translation function and language files for the installer.
@@ -56,10 +58,21 @@ class installer_base {
 		echo 'WARNING: '.$msg."\n";
 	}
 
-	public function simple_query($query, $answers, $default) {
-		$finished = false;
+	public function simple_query($property, $query, $answers, $default) {
+            
+                $answers_str = implode(',', $answers);
+                
+                if (isset($this->default[$property])) {
+                    $input = $this->default[$property];
+                    if (in_array($input, $answers)) {
+                        return $this->default[$property];
+                    }
+                    throw new OutOfRangeException("Value '".$input."' of '".$property."' is not one of: ".$answers_str);
+                }
+		
+                $finished = false;
 		do {
-			$answers_str = implode(',', $answers);
+			
 			swrite($this->lng($query).' ('.$answers_str.') ['.$default.']: ');
 			$input = sread();
 
@@ -86,7 +99,12 @@ class installer_base {
 		return $answer;
 	}
 
-	public function free_query($query, $default) {
+	public function free_query($property, $query, $default) {
+            
+                if (isset($this->default[$property])) {
+                    return $this->default[$property];
+                }
+            
 		swrite($this->lng($query).' ['.$default.']: ');
 		$input = sread();
 
@@ -2359,7 +2377,6 @@ class installer_base {
 
 		return $tContents;
 	}
-
 }
 
 ?>

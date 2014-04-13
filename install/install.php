@@ -70,18 +70,26 @@ require_once 'lib/classes/tpl.inc.php';
 
 //** Check for existing installation
 /*if(is_dir("/usr/local/ispconfig")) {
-    die('We will stop here. There is already a ISPConfig installation, use the update script to update this installation.');
+    _die('We will stop here. There is already a ISPConfig installation, use the update script to update this installation.');
 }*/
 
 //** Get distribution identifier
 $dist = get_distname();
 
-if($dist['id'] == '') die('Linux distribution or version not recognized.');
+if($dist['id'] == '') _die('Linux distribution or version not recognized.');
 
 //** Include the distribution-specific installer class library and configuration
 if(is_file('dist/lib/'.$dist['baseid'].'.lib.php')) include_once 'dist/lib/'.$dist['baseid'].'.lib.php';
 include_once 'dist/lib/'.$dist['id'].'.lib.php';
 include_once 'dist/conf/'.$dist['id'].'.conf.php';
+
+include_once 'lib/configuration.lib.php';
+
+//****************************************************************************************************
+//** Read and parse command line options from script invokation
+//****************************************************************************************************
+$options = getopt('', array('config:'));
+$config = configuration::read($options);
 
 //****************************************************************************************************
 //** Installer Interface
@@ -94,15 +102,15 @@ swriteln($inst->lng('    Tap in "quit" (without the quotes) to stop the installe
 
 //** Check log file is writable (probably not root or sudo)
 if(!is_writable(dirname(ISPC_LOG_FILE))){
-	die("ERROR: Cannot write to the ".dirname(ISPC_LOG_FILE)." directory. Are you root or sudo ?\n\n");
+	_die("ERROR: Cannot write to the ".dirname(ISPC_LOG_FILE)." directory. Are you root or sudo ?\n\n");
 }
 
 if(is_dir('/root/ispconfig') || is_dir('/home/admispconfig')) {
-	die('This software cannot be installed on a server wich runs ISPConfig 2.x.');
+	_die('This software cannot be installed on a server wich runs ISPConfig 2.x.');
 }
 
 if(is_dir('/usr/local/ispconfig')) {
-	die('ISPConfig 3 installation found. Please use update.php instead if install.php to update the installation.');
+	_die('ISPConfig 3 installation found. Please use update.php instead if install.php to update the installation.');
 }
 
 //** Detect the installed applications
@@ -127,7 +135,7 @@ $conf['hostname'] = $inst->free_query('Full qualified hostname (FQDN) of the ser
 unset($tmp_out);
 
 // Check if the mysql functions are loaded in PHP
-if(!function_exists('mysql_connect')) die('No PHP MySQL functions available. Please ensure that the PHP MySQL module is loaded.');
+if(!function_exists('mysql_connect')) _die('No PHP MySQL functions available. Please ensure that the PHP MySQL module is loaded.');
 
 //** Get MySQL root credentials
 $finished = false;
@@ -160,7 +168,7 @@ unset($finished);
 
 // Resolve the IP address of the MySQL hostname.
 $tmp = explode(':', $conf['mysql']['host']);
-if(!$conf['mysql']['ip'] = gethostbyname($tmp[0])) die('Unable to resolve hostname'.$tmp[0]);
+if(!$conf['mysql']['ip'] = gethostbyname($tmp[0])) _die('Unable to resolve hostname'.$tmp[0]);
 unset($tmp);
 
 

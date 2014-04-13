@@ -55,6 +55,13 @@ error_reporting(E_ALL|E_STRICT);
 
 $FILE = realpath('../install.php');
 
+// This function is die() equivalent replacer.
+// However it writes to stderr and return $exitcode.
+function _die($message, $exitcode = 1) {
+    file_put_contents('php://stderr', $message);
+    exit($exitcode);
+}
+
 //** Get distribution identifier
 //** IMPORTANT!
 //   This is the same code as in server/lib/classes/monitor_tools.inc.php
@@ -268,7 +275,7 @@ function get_distname() {
 		swriteln("Operating System: Gentoo $distver or compatible\n");
 
 	} else {
-		die('Unrecognized GNU/Linux distribution');
+		_die('Unrecognized GNU/Linux distribution');
 	}
 
 	return array('name' => $distname, 'version' => $distver, 'id' => $distid, 'baseid' => $distbaseid);
@@ -293,7 +300,7 @@ function ilog($msg){
 
 function error($msg){
 	ilog($msg);
-	die($msg."\n");
+	_die($msg."\n");
 }
 
 function caselog($command, $file = '', $line = '', $success = '', $failure = ''){
