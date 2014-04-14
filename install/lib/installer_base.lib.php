@@ -775,9 +775,15 @@ class installer_base {
 		}
 
 		if(!stristr($options, 'dont-create-certs')) {
+
+		        $params = '';
+		        if (isset($this->default['postfix.cert_subj'])) {
+		            $params .= ' -subj "'.$this->default['postfix.cert_subj'].'"';
+		        }
+
 			//* Create the SSL certificate
 			$command = 'cd '.$config_dir.'; '
-				.'openssl req -new -outform PEM -out smtpd.cert -newkey rsa:4096 -nodes -keyout smtpd.key -keyform PEM -days 3650 -x509';
+				.'openssl req -new -outform PEM -out smtpd.cert -newkey rsa:4096 -nodes -keyout smtpd.key -keyform PEM -days 3650 -x509' . $params;
 			exec($command);
 
 			$command = 'chmod o= '.$config_dir.'/smtpd.key';
@@ -1730,10 +1736,15 @@ class installer_base {
 
 		if(!@is_dir($install_dir.'/interface/ssl')) mkdir($install_dir.'/interface/ssl', 0755, true);
 
+		$params = '';
+		if (isset($this->default['ispconfig.cert_subj'])) {
+		    $params .= ' -subj "'.$this->default['ispconfig.cert_subj'].'"';
+		}
+
 		$ssl_pw = substr(md5(mt_rand()), 0, 6);
 		exec("openssl genrsa -des3 -passout pass:$ssl_pw -out $ssl_key_file 4096");
-		exec("openssl req -new -passin pass:$ssl_pw -passout pass:$ssl_pw -key $ssl_key_file -out $ssl_csr_file");
-		exec("openssl req -x509 -passin pass:$ssl_pw -passout pass:$ssl_pw -key $ssl_key_file -in $ssl_csr_file -out $ssl_crt_file -days 3650");
+		exec("openssl req -new -passin pass:$ssl_pw -passout pass:$ssl_pw -key $ssl_key_file -out $ssl_csr_file" . $params);
+		exec("openssl req -x509 -passin pass:$ssl_pw -passout pass:$ssl_pw -key $ssl_key_file -in $ssl_csr_file -out $ssl_crt_file -days 3650" . $params);
 		exec("openssl rsa -passin pass:$ssl_pw -in $ssl_key_file -out $ssl_key_file.insecure");
 		rename($ssl_key_file, $ssl_key_file.'.secure');
 		rename($ssl_key_file.'.insecure', $ssl_key_file);
